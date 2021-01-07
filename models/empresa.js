@@ -1,0 +1,112 @@
+const { Schema, model } = require('mongoose');
+
+
+const empresaSchema  = Schema({
+    RazonSocial:{
+        type:String,
+    },
+    NombreComercial:{
+        type:String,
+    },
+    Rfc:{
+        type:String,
+    },
+    Persona:{
+        type:String,
+    },
+    Perfil:{
+        type:String,
+    },
+    Persona:{
+        type:String,
+    },
+    TipoEmpresa:{
+        type:String,
+    },
+    NoEmpleados:{
+        type:String,
+    },
+    FacAnual:{
+        type:String,
+    },
+    Estatus:{
+        type:Boolean,
+        default:true
+    },
+    Logo:{
+        type:String,
+    },
+    DatosPago:{
+        type:Object,
+        plan:{
+            type:String
+        },
+        IDPasarela:{
+            type:String
+        }
+    },
+    Contacto:{
+        type:Object,
+        Web:{
+            type:String
+        },
+        Faceboock:{
+            type:String
+        }
+    },
+    Direccion:{
+        type:Object,
+        CalleNumero:{
+            type:String,
+        },
+        Estado:{
+            type:String,
+        },
+        Municipio:{
+            type:String,
+        },
+        Colonia:{
+            type:String
+        },
+        Cp:{
+            type:String,
+        },
+    },
+    Telefono:{
+        type:Object,
+        TelefonoP:{
+            type:Object,
+            Numero:{
+                type:String
+            },
+            Tipo:{
+                type:String
+            }
+        },
+        TelefonoD:{
+            type:Object,
+            Numero:{
+                type:String
+            },
+            Tipo:{
+                type:String
+            }
+        },
+        TelefonoT:{
+            type:Object,
+            Numero:{
+                type:String
+            },
+            Tipo:{
+                type:String
+            }
+        }
+    }
+
+});
+empresaSchema.method('toJSON',function (){
+    const { __v,_id,...Object} = this.toObject();
+    Object.id = _id;
+    return Object;
+});
+module.exports = model('Empresa',empresaSchema);

@@ -1,0 +1,29 @@
+{
+  "name": "backendadmyo",
+  "version": "1.0.0",
+  "description": "Este es el backend del admyo",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Leonado Lira Cazares",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.813.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "connect-multiparty": "^2.2.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.8.0",
+    "fs": "0.0.1-security",
+    "helmet": "^4.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.11.8",
+    "mongoose-slug-generator": "^1.0.4",
+    "mongoose-unique-validator": "^2.0.3",
+    "nodemailer": "^6.4.17",
+    "nodemon": "^2.0.6",
+    "passport": "^0.4.1"
+  }
+}
