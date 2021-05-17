@@ -1,11 +1,28 @@
 const { models } = require('mongoose');
 const marcaDB = require('../models/marcas');
-
+const { cargar } = require('../helpers/uploadmarca');
 const add= async (req,res)=>{
     const eid = req.IDEmpresa;
     const datos = req.body;
+    datos.IDEmpresa = eid;
+    
     try {
-        datos.IDEmpresa = eid;
+      if(req.files.Logo){
+        var file = req.files.Logo;
+        var myKey = eid + "_" + file.name;
+    
+        const respuestacon = await cargar(myKey, file.path, eid);
+        if (!respuestacon.ok) {
+            return res.status(500).json({
+                ok: false,
+                msg: respuestacon.error
+            });
+        }
+        // si ya lo cargo ahora guardo los datos
+          datos.Logo = 'https://marcasadmyo.s3.amazonaws.com/' + myKey;
+      }
+     
+
         // guardo la marca
         const marca = new marcaDB(datos);
         const respuesta = await marca.save();
@@ -28,7 +45,23 @@ const add= async (req,res)=>{
 const update = async (req,res)=>{
     const datos = req.body;
     const id= req.params.id;
-  try {
+    const eid = req.IDEmpresa;
+
+    try {
+      if(req.files.Logo){
+        var file = req.files.Logo;
+        var myKey = eid + "_" + file.name;
+    
+        const respuestacon = await cargar(myKey, file.path, eid);
+        if (!respuestacon.ok) {
+            return res.status(500).json({
+                ok: false,
+                msg: respuestacon.error
+            });
+        }
+        // si ya lo cargo ahora guardo los datos
+          datos.Logo = 'https://marcasadmyo.s3.amazonaws.com/' + myKey;
+      }
       const updatemarca = await marcaDB.findByIdAndUpdate(
         id,
         datos,

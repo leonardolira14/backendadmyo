@@ -6,7 +6,7 @@ const { check } = require('express-validator');
 const { validaCampos }  = require('../middlewares/validar-campos');
 const { validarJWTMaster}  = require('../middlewares/validarMaster');
 const { add,update,deleteC,get,getall } = require('../controller/certificacion');
-
+const { validarJWT }  = require('../middlewares/validat-jwt');
 
 
 
@@ -44,7 +44,11 @@ router.get(
     get
 );
 router.get(
-    '/getall/',
+    '/getall',
+    [
+        validarJWT,
+       
+    ],
     getall
 );
 

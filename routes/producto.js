@@ -3,6 +3,7 @@ const router = Router();
 const multiparty = require('connect-multiparty');
 const  multipartyMiddleware = multiparty();
 const { validarJWTMaster}  = require('../middlewares/validarMaster');
+const { validarJWT  }  =require('../middlewares/validat-jwt');
 const { add,update,deleteC,get,getall } = require('../controller/producto');
 
 
@@ -41,6 +42,9 @@ router.get(
 );
 router.get(
     '/getall/',
+    [
+        validarJWT
+    ],
     getall
 );
 

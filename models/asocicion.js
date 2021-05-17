@@ -4,7 +4,7 @@ const asociacionesSchema = new Schema({
     IDEmpresa:{
         type:String
     },
-    IDAsociacion: [{ type: Schema.Types.ObjectId, ref: 'listasociacion' }],
+    Asociacion: [{ type: Schema.Types.ObjectId, ref: 'listasociacion' }],
     FechaAlta:{
         type:Date,
         default:Date.now()

@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { actviartoken, login }  = require('../controller/auth');
+const { actviartoken, login,recupera }  = require('../controller/auth');
 const { check } = require('express-validator');
 const { validaCampos  } = require('../middlewares/validar-campos');
 const { validarJWT }  = require('../middlewares/validat-jwt');
@@ -15,3 +15,6 @@ route.post('/login',
 ]
 ,login);
 module.exports = route;
+
+route.post('/recupera',recupera);
+

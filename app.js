@@ -18,6 +18,7 @@ const router_usuario  = require('./routes/usuarios');
 const router_producto  = require('./routes/producto');
 const router_visita  = require('./routes/visitas');
 const router_imagen  = require('./routes/image');
+const roue_giros = require('./routes/giros')
 const router_calificaciones  = require('./routes/calficaciones');
 //midelware
 
@@ -29,7 +30,7 @@ app.use(helmet());
 //cors
 app.use((req,res,next)=>{
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
+    res.header('Access-Control-Allow-Headers', 'Authorization,x-token,X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
     res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
     res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
     next();
@@ -48,5 +49,6 @@ app.use('/api/usuarios',router_usuario);
 app.use('/api/giros/empresa',router_giroempresa);
 app.use('/api/visitas',router_visita);
 app.use('/api/imagen',router_imagen);
+app.use('/api/giros',roue_giros);
 app.use('/api/calificaciones',router_calificaciones);
 module.exports = app;

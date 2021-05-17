@@ -37,6 +37,7 @@ const add = async (req,res) => {
         const contrasena = bycript.hashSync(password,salt);
         datos.IDEmpresa = eid;
         datos.Password  = contrasena;
+        datos.Status = false;
 
         const usuario = new usuariosDB(datos);
         const respuest = await usuario.save();
@@ -80,12 +81,19 @@ const deleteu = async (req,res) =>{
                 msg:'Existe un error al enviar el correo de activación favor de contactar al administrador'
             });
         }
-        //elimino el usuario
-        const deletet = await usuariosDB.findByIdAndRemove(id);
+
+
+        //DOY DE BAJA el usuario
+        datosUser.status = false;
+        const udapteuser = await usuariosDB.findByIdAndUpdate(
+            id,
+            datosUser,
+            {new:true}
+            )
         return res.status(200).json({
             ok: true,
-            msg: 'Usuario eliminado',
-            data:deletet
+            msg: 'Usuario dado de baja',
+            data:udapteuser
         });
     } catch (error) {
         console.log(error);
@@ -101,6 +109,7 @@ const update = async (req,res)=>{
         const id = req.params.id;
         const eid = req.IDEmpresa;
         const datos = req.body;
+       
         if(req.files.Logo){
             var file = req.files.Logo;
             var myKey = eid + "_" + file.name;
@@ -168,7 +177,7 @@ const getall = async (req,res)=>{
         const id = req.IDEmpresa;
         console.log(id);
         const usuario  = await usuariosDB.find({IDEmpresa:id});
-        delete usuario.Password;
+         usuario.Password='';
         return res.status(200).json({
             ok:true,
             data:usuario
@@ -201,7 +210,7 @@ const master = async (req,res)=>{
                 msg:'Error al modificar el usuario'
             });
         }
-        delete newuser.Password;
+        mewmaster.Password='';
         return res.status(200).json({
             ok:true,
             data: mewmaster
@@ -217,9 +226,9 @@ const master = async (req,res)=>{
 }
 const updatepasword = async (req,res)=>{
     try {
-     const id = req.params.id;
-     const clave1 = req.body.Password;
-     const clave2 = req.body.PasswordN;
+     const id = req.uid;
+     const clave1 = req.body.ClaveAnterior;
+     const clave2 = req.body.ClaveNueva;
      const usuarioDB = await usuariosDB.findById(id);
         // valido que la contraseña sea igual a la anteriror
     const validPassword = bycript.compareSync(clave1,usuarioDB.Password);
@@ -251,6 +260,40 @@ const updatepasword = async (req,res)=>{
             });
     }
 }
+
+const preUsuario = async(eid,Correo)=>{
+    try {
+        let datos = [];
+        const password = generatePasswordRand(6);
+        const salt = bycript.genSaltSync();
+        const contrasena = bycript.hashSync(password,salt);
+        datos.IDEmpresa = eid;
+        datos.Password  = contrasena;
+        datos.Status = false;
+        datos.Correo = Correo
+        console.log(datos);
+        const usuario = new usuariosDB(datos);
+        const respuest = await usuario.save();
+        const respuestamai = await activeus(Correo,Correo,Correo,respuest.id,password);
+        if(respuestamai === false){
+            return {
+                ok:false,
+                msg:'Existe un error al enviar el correo de activación favor de contactar al administrador'
+            };
+        }
+        return {
+            ok:true,
+            msg:respuest
+        };
+        
+    } catch (error) {
+        console.log(error);
+        return {
+            ok: false,
+            msg: 'Hable con el administrador'
+        };
+    }
+}
 module.exports = {
     add,
     deleteu,
@@ -258,5 +301,6 @@ module.exports = {
     get,
     getall,
     master,
-    updatepasword
+    updatepasword,
+    preUsuario
 }

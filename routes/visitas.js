@@ -4,7 +4,7 @@ const { validarJWTMaster}  = require('../middlewares/validarMaster');
 const { validarJWT }  = require('../middlewares/validat-jwt');
 const { getAll,addrelacion,addvisita } = require('../controller/visitas');
 
-route.get('/getall',validarJWT,getAll);
+route.get('/getall/:tiempo',validarJWT,getAll);
 
 route.post('/addrelacion',validarJWT,addrelacion);
 

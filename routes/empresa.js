@@ -2,21 +2,20 @@ const { Router }  = require('express');
 const router = Router();
 const { check } = require('express-validator');
 const { validaCampos }  = require('../middlewares/validar-campos');
-const { addCompany } = require('../controller/empresa');
+const { addCompany,getdata,update,updatelogo } = require('../controller/empresa');
+const { validarJWT }  = require('../middlewares/validat-jwt');
+const { validarJWTMaster } = require('../middlewares/validarMaster');
+const multiparty = require('connect-multiparty');
+const  multipartyMiddleware = multiparty();
 
 
 router.post(
     '/add/',
-    [
-        check('RazonSocial','El campo Razon Social es obligatorio').not().isEmpty(),
-        check('Rfc','El campo RFC es obligatorio').not().isEmpty(),
-        check('Nombre','El campo RFC es obligatorio').not().isEmpty(),
-        check('Apellidos','El campo RFC es obligatorio').not().isEmpty(),
-        check('Correo','El campo Correo Electronico es obligatorio').isEmail(),
-        check('Password','El campo RFC es obligatorio').not().isEmpty(),
-        validaCampos
-    ],
     addCompany
 );
+
+router.get('/getdata',validarJWT,getdata);
+router.put('/updatedate',validarJWTMaster,update);
+router.put('/updatelogo',[multipartyMiddleware,validarJWTMaster],updatelogo);
 
 module.exports = router;

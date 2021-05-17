@@ -54,7 +54,23 @@ const calificacionSchema = new Schema({
         type:String
     },
     Detalle:{
-        Cumplimiento:[{
+        CalificacionCumplimiento:{
+            type:Number
+        },
+        CalificacionCalidad:{
+            type:Number
+        },
+        CalificacionOferta:{
+            type:Number
+        },
+        CalificacionSanidad:{
+            type:Number
+        },
+        CalificacionSocioambiental:{
+            type:Number
+        },
+        Cumplimiento:
+        [{
             Pregunta:{
                 type: Schema.Types.ObjectId,
             },
@@ -65,6 +81,9 @@ const calificacionSchema = new Schema({
                 type:Number
             },
             PuntosPosibles:{
+                type:Number
+            },
+            calificacion:{
                 type:Number
             }
         }],
@@ -80,6 +99,9 @@ const calificacionSchema = new Schema({
             },
             PuntosPosibles:{
                 type:Number
+            },
+            calificacion:{
+                type:Number
             }
         }],
         Oferta:[{
@@ -93,6 +115,9 @@ const calificacionSchema = new Schema({
                 type:Number
             },
             PuntosPosibles:{
+                type:Number
+            },
+            calificacion:{
                 type:Number
             }
         }],
@@ -108,6 +133,9 @@ const calificacionSchema = new Schema({
             },
             PuntosPosibles:{
                 type:Number
+            },
+            calificacion:{
+                type:Number
             }
         }],
         Socioambiental:[{
@@ -122,6 +150,9 @@ const calificacionSchema = new Schema({
             },
             PuntosPosibles:{
                 type:Number
+            },
+            calificacion:{
+                type:Number
             }
         }],
         Recomendacion:[{
@@ -135,6 +166,9 @@ const calificacionSchema = new Schema({
                 type:Number
             },
             PuntosPosibles:{
+                type:Number
+            },
+            calificacion:{
                 type:Number
             }
         }],

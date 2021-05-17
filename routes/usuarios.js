@@ -31,7 +31,7 @@ route.get('/master/:id',
 [validarJWTMaster],
     master
 );
-route.get('/udpatepassword/:id',
+route.post('/udpatepassword',
 [validarJWT],
     updatepasword
 );

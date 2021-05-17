@@ -17,9 +17,6 @@ const empresaSchema  = Schema({
     Perfil:{
         type:String,
     },
-    Persona:{
-        type:String,
-    },
     TipoEmpresa:{
         type:String,
     },
@@ -35,6 +32,9 @@ const empresaSchema  = Schema({
     },
     Logo:{
         type:String,
+    },
+    Diaspago:{
+        type:String
     },
     DatosPago:{
         type:Object,

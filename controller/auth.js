@@ -4,7 +4,9 @@ const AccesosDB = require('../models/accesos');
 const bcrypt = require('bcryptjs');
 const { generarJWT } = require('../helpers/jwt');
 const accesos = require('../models/accesos');
-const { active } = require('../helpers/mail');
+const { active,recuperapassword } = require('../helpers/mail');
+const  {generatePasswordRand} = require('../helpers/funciones');
+const bycript = require('bcryptjs');
 // funcion para activar el usuario
 
 const actviartoken = async(req,res) => {
@@ -93,9 +95,53 @@ const login = async (req,res)=>{
     }
 }
 
+const recupera = async(req,res)=>{
+   
+    const correo = req.body.correo;
+    try {
+        const usuarioDB = await UsuarioDB.findOne({Correo: correo});
+        if(!usuarioDB){
+            return res.status(404).json({
+                ok: false,
+                msg: 'Email no encontrado'
+            });
+        }
+        const password = generatePasswordRand(6);
+
+        // ahora envio el correo avisando de la nueva contraseña
+        const respuestaemail = await recuperapassword(usuarioDB.Correo,password,usuarioDB.Nombre);
+        if(!respuestaemail){
+            return res.status(500).json({
+                ok: false,
+                error:respuestaemail,
+                msg: 'Hable con el administrador'
+            });
+        }
+
+        const salt = bycript.genSaltSync();
+        const contrasena = bycript.hashSync(password,salt);
+        const newuser  = await UsuarioDB.findByIdAndUpdate(usuarioDB.id,{Password: contrasena});
+        if(!newuser){
+            return res.status(404).json({
+                ok: false,
+                msg: 'Usuario no registrador'
+            }); 
+        }
+        return res.status(200).json({
+            ok:true
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Hable con el administrador'
+        });
+    }
+}
 
 
 module.exports = {
     actviartoken,
-    login
+    login,
+    recupera
 }

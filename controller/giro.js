@@ -50,6 +50,7 @@ const deleteR = async (req,res)=>{
 const PrincipalG = async (req,res)=>{
     const id =  req.params.id;
     const eid = req.IDEmpresa;
+    console.log(id);
     try {
         // ahora pongo todos los giros sin principal
         await relacionGiroDB.updateMany(
@@ -166,6 +167,7 @@ const  getgiros =async(req,res)=>{
 }
 const  getsubgiros =async(req,res)=>{
     const id = req.params.id;
+
     try {
         const subgiros = await  subgiroDB.find({IDGiro:id});
         return res.status(200).json({
@@ -194,6 +196,7 @@ const  getramas =async(req,res)=>{
         });
     }
 }
+
 module.exports = {
     PrincipalG,
     add,

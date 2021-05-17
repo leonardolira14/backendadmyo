@@ -5,8 +5,10 @@ const add = async (req, res) => {
     const eid = req.IDEmpresa;
     const datos = req.body;
     // https://certificacionesadmyo.s3.amazonaws.com/
-    var file = req.files.archivo;
+   
+    var file = req.files.Logo;
     var myKey = eid + "_" + file.name;
+    datos.IDEmpresa = eid;
 
     try {
         const respuesta = await cargar(myKey, file.path, eid);
@@ -102,9 +104,9 @@ const update = async (req,res)=>{
             msg:'Certificacion no registrada'
         });
     }
-    
-    if(req.files.archivo !== undefined){
-        var file = req.files.archivo;
+
+    if(req.files.Logo !== undefined){
+        var file = req.files.Logo;
         var myKey = eid + "_" + file.name;
         const respuesta = await cargar(myKey, file.path, eid);
         if (!respuesta.ok) {
