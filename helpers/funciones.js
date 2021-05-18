@@ -627,6 +627,130 @@ const listaPreguntasD = async (array,categoria)=>{
     }
     return lista
 }
+// funcion para contar cuantas respuestas hay de una pregunta;
+const cuenta_respuestas_dia = async (categoria,fechaI,fechaF,Tipo,empresaReceptora,subGiro,idpregunta)=>{
+    fechaInicio = moment(fechaI).format("YYYY-MM-DDT00:00:00.000") + "Z";
+    fechaFin = moment(fechaF).format("YYYY-MM-DDT00:00:00.000") + "Z";
+    let most ={};
+    const detalle = "Detalle."+categoria+".$";
+    const pregunta = "Detalle."+categoria+".Pregunta";
+    const query ={
+        "IDGiroReceptor.subGiro.0":subGiro,
+        "IDEmpresaReceptor.0":empresaReceptora,
+        "Emitidopara":Tipo,
+        $and:[
+            { FechaRealizada:{$gte: fechaInicio }},  // devuelve true si se cumple la igualdad de loss elementos
+                { FechaRealizada:{$lte: fechaFin}},
+            ]    
+        
+    };
+    query[pregunta] = idpregunta;
+    most[detalle] = 1;
+    const calif  = await calificacionesDB.find(query,most).populate({ path: pregunta, model: 'pregunta' });
+  
+    let SI =0;
+    let NO =0;
+    let NA =0;
+    let NS =0;
+    let po= 0;
+    let pp=0;
+    let data = [];
+    let i=1;
+        for (let detalle of calif){   
+       
+        detalle.Detalle[categoria].forEach(Pregunta=>{
+            if(Pregunta.Respuesta === 'SI'){
+                SI++;
+            }
+            if(Pregunta.Respuesta === 'NO'){
+                NO++;
+            }
+            if(Pregunta.Respuesta === 'NA'){
+                NA++;
+            }
+            if(Pregunta.Respuesta === 'NS'){
+                NS++;
+            }
+            po = po+Pregunta.PuntosObtenidos;
+            pp = pp+Pregunta.PuntosPosibles;
+        });
+        //console.log(detalle.Detalle[categoria]);
+    
+    };
+    total = (po/pp)*10;
+        data["SI"] = SI;
+        data["NO"] = NO;
+        data["NA"] = NA;
+        data["NS"] = NS;
+        data['Media'] = total ;
+        data['TotalCalificaciones'] = calif.length
+       
+      return data;
+}
+const cuenta_respuestas_mes = async (categoria,fechaI,fechaF,Tipo,empresaReceptora,subGiro,idpregunta)=>{
+    fechaInicio = moment(fechaI).format("YYYY-MM-DDT00:00:00.000") + "Z";
+    FechaFin = moment(fechaF).format("YYYY-MM-DDT00:00:00.000") + "Z";
+
+    let most ={};
+    const detalle = "Detalle."+categoria+".$";
+    const pregunta = "Detalle."+categoria+".Pregunta";
+    const query ={
+        "IDGiroReceptor.subGiro.0":subGiro,
+        "IDEmpresaReceptor.0":empresaReceptora,
+        "Emitidopara":Tipo,
+        $expr: {
+            $and:  [ // indica que cada comparación entre elementos del array se debe satisfacer
+                { $gte : [ { $year:   '$FechaRealizada' }, { $year: fechaInicio } ] },  // devuelve true si se cumple la igualdad de loss elementos
+                { $gte : [ { $month:   '$FechaRealizada' }, { $month: fechaInicio } ] },
+                { $gte : [ { $dayOfMonth: '$FechaRealizada' }, { $dayOfMonth: fechaInicio } ] } ,
+                { $lte : [ { $year:   '$FechaRealizada' }, { $year: FechaFin } ] },  // devuelve true si se cumple la igualdad de loss elementos
+                { $lte : [ { $month:   '$FechaRealizada' }, { $month: FechaFin } ] },
+                { $lte : [ { $dayOfMonth: '$FechaRealizada' }, { $dayOfMonth: FechaFin } ] }
+              ],
+              
+            }   
+        
+    };
+    query[pregunta] = idpregunta;
+    most[detalle] = 1;
+    console.log(JSON.stringify(query));
+    return ;
+    const calif  = await calificacionesDB.find(query,most).populate({ path: pregunta, model: 'pregunta' });
+  
+    let SI =0;
+    let NO =0;
+    let NA =0;
+    let NS =0;
+    let po= 0;
+    let pp=0;
+    let data = [];
+        for (let detalle of calif){   
+       
+        detalle.Detalle[categoria].forEach(Pregunta=>{
+            if(Pregunta.Respuesta === 'SI'){
+                SI++;
+            }
+            if(Pregunta.Respuesta === 'NO'){
+                NO++;
+            }
+            if(Pregunta.Respuesta === 'NA'){
+                NA++;
+            }
+            if(Pregunta.Respuesta === 'NS'){
+                NS++;
+            }
+        });
+        //console.log(detalle.Detalle[categoria]);
+    
+    };
+        data["SI"] = SI;
+        data["NO"] = NO;
+        data["NA"] = NA;
+        data["NS"] = NS;
+       
+      return data;
+}
+
 module.exports = {
     generatePasswordRand,
     separar,
@@ -645,5 +769,8 @@ module.exports = {
     listaPreguntas,
     dataCalificacionesGenPregunta,
     capitalize,
-    listaPreguntasD
+    listaPreguntasD,
+    cuenta_respuestas_dia,
+    cuenta_respuestas_mes
+
 }

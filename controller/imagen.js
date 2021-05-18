@@ -14,7 +14,9 @@ const {
      dataCalificacionesGenMesGiro,
      dataCalificacionesGenGiro,
      listaPreguntas,dataCalificacionesGenPregunta,
-     capitalize,listaPreguntasD
+     capitalize,listaPreguntasD,
+     cuenta_respuestas_dia,
+    cuenta_respuestas_mes
     } = require('../helpers/funciones');
 
 
@@ -112,7 +114,7 @@ const DetalleImagen = async(req,res)=>{
     try {
        // const eid = req.IDEmpresa;
        const eid = '5fe99768bf21c3342b3c05f8' ;
-       const fecha = req.params.fecha;
+       const fechaP = req.params.fecha;
         const tipo = req.params.tipo;
         let giro;
         if(req.params.giro || req.params.giro!==undefined || req.params.giro!=='NA'){
@@ -128,20 +130,20 @@ const DetalleImagen = async(req,res)=>{
         var f = new Date();
         let array_fechas = [];
         let periodo;
-
-        array_fechas = await mesesdias(fecha);
+        const categorias = ['Calidad','Cumplimiento','Sanidad','Socioambiental','Oferta'];
+        array_fechas = await mesesdias(fechaP);
         
-        array_fechas_pasados = await mesesdiasPasados(fecha);
+        array_fechas_pasados = await mesesdiasPasados(fechaP);
         fechaInicio = new Date(array_fechas[0]);
         fechaFin = new Date(array_fechas[array_fechas.length - 1]);
  
         // obtengo las calificaciones que ha recibido en estas ultimas fechas actual
         let  calificiacionesRecibidasActuales,calificiacionesRecibidasPasadas ;
-        if(fecha === 'M'){
+        if(fechaP === 'M'){
             periodo = await dameNombreMes(fechaInicio.getMonth()) + "-" + fechaInicio.getUTCFullYear() + ' / ' + await dameNombreMes(fechaFin.getMonth()) + "-" + fechaFin.getUTCFullYear();
             calificiacionesRecibidasActuales = await dataCalificacionesGenGiro( array_fechas[0],array_fechas[array_fechas.length - 1],eid,tipo,giro);
             calificiacionesRecibidasPasadas = await dataCalificacionesGenGiro( array_fechas_pasados[0],array_fechas_pasados[array_fechas_pasados.length - 1],eid,tipo,giro);
-        }else if(fecha === 'MA'){
+        }else if(fechaP === 'MA'){
             const f1 = new Date(f.getFullYear()+'-'+(f.getMonth()+1)+'-01').toISOString();
             const f2 = new Date(f.getFullYear()+'-'+(f.getMonth()+1)+'-'+f.getDate()).toISOString();
             const f1P = new Date((f.getFullYear()-1)+'-'+(f.getMonth()+1)+'-01').toISOString();
@@ -160,28 +162,52 @@ const DetalleImagen = async(req,res)=>{
      
         // necesito la lista de las preguntas dependiento del giro principal
         const ListaPreguntas = preguntas[0];
-        const listCalidad =await listaPreguntasD(preguntas[0],'Calidad')
-        const listCumplimiento=await listaPreguntasD(preguntas[0],'Cumplimiento');
-        const listSanidad=await listaPreguntasD(preguntas[0],'Sanidad');
-        const listSociambiental=await listaPreguntasD(preguntas[0],'Socioambiental');
-        const listOferta =await listaPreguntasD(preguntas[0],'Oferta');
+        
+        
+        
+       
        
        // para graficar tengo que recorren la listade las preguntas por categoria y saber cuantas veces se contesto esa pregunta
         // en la fecha
-        const dat= await dataCalificacionesGenPregunta(array_fechas[0],array_fechas[array_fechas.length - 1],eid,tipo,giro,listCalidad[0].IDPregunta,'Calidad');
-        
        
-
+       
+       
+        let data= [];
+        var  obj={};
+       for(let categoria of categorias){
+            let dataslist = [];
+            const listapreguntas = await listaPreguntasD(preguntas[0],categoria);
+           for (let Pregunta of listapreguntas){   
+            let dataCalidadSI = [];
+            let dataCalidadNO = [];
+            let dataCalidadNA = [];
+            let dataCalidadNS = [];
+            let dataCalidadtotal =[];
+            let calif;
+            for (let fecha of array_fechas){  
+                if(fechaP ==='M'){
+                    calif = await cuenta_respuestas_dia(categoria,fecha,fecha,tipo,eid,giro,Pregunta.IDPregunta);
+                } else{
+                     calif = await cuenta_respuestas_mes(categoria,fecha,fecha,tipo,eid,giro,Pregunta.IDPregunta);
+                }
+               
+                 dataCalidadSI.push(calif.SI);
+                 dataCalidadNO.push(calif.SI);
+                 dataCalidadNA.push(calif.SI);
+                 dataCalidadNS.push(calif.SI);
+            };
+            dataslist.push({Forma:Pregunta.Forma,IDPregunta:Pregunta.IDPregunta,Pregunta:Pregunta.Pregunta,serie:[{data:dataCalidadSI,label:'SI'},{data:dataCalidadNO,label:'NO'},{data:dataCalidadNA,label:'NA'},{data:dataCalidadNS,label:'NS'}]});
+        };
+        obj[categoria] = dataslist;
+       }
+       data.push(obj);
          // console.log(calificiacionesRecibidas)
          return res.status(200).json({
             ok: true,
             periodo,
             MediaGeneral:calificiacionesRecibidasActuales.proemdioGeneral,
-            listCalidad,
-            listCumplimiento,
-            listSanidad,
-            listSociambiental,
-            listOferta
+            listdata: data,
+            labels:array_fechas   
             
         })
 
